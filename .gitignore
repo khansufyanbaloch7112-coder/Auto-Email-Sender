@@ -4,3 +4,4 @@ __pycache__/
 leads.txt
 token.json
 credentials.json
+.idea/
