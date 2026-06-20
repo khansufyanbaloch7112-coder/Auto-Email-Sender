@@ -1,6 +1,7 @@
 # app.py
-from dotenv import load_dotenv
-load_dotenv()
+import os
+
+groq_key = os.getenv("GROQ_API_KEY")
 
 import streamlit as st
 from typing import List
