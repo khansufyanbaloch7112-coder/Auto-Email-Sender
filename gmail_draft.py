@@ -1,4 +1,4 @@
-import os.path
+import os
 import base64
 from email.message import EmailMessage
 
@@ -8,23 +8,23 @@ from googleapiclient.discovery import build
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
+TOKEN_PATH = os.getenv("GMAIL_TOKEN_PATH", "token.json")
+CREDENTIALS_PATH = os.getenv("GMAIL_CREDENTIALS_PATH", "credentials.json")
+
+
 def get_gmail_service():
     creds = None
 
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    if os.path.exists(TOKEN_PATH):
+        creds = Credentials.from_authorized_user_file(TOKEN_PATH, SCOPES)
 
     if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file(
-            "credentials.json",
-            SCOPES
+        raise Exception(
+            "Gmail token not found or invalid. On Render, add token.json as a Secret File."
         )
-        creds = flow.run_local_server(port=0)
-
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
 
     return build("gmail", "v1", credentials=creds)
+
 
 def create_draft(to, subject, body):
     service = get_gmail_service()
@@ -38,24 +38,17 @@ def create_draft(to, subject, body):
         message.as_bytes()
     ).decode()
 
-    draft = {
-        "message": {
-            "raw": encoded_message
-        }
-    }
-
-    created_draft = service.users().messages().send(
+    sent_message = service.users().messages().send(
         userId="me",
-        body={
-            "raw": encoded_message
-        }
+        body={"raw": encoded_message}
     ).execute()
 
-    print("Send successfully:", created_draft["id"])
+    return f"Send successfully: {sent_message['id']}"
+
 
 if __name__ == "__main__":
     create_draft(
         to="test@example.com",
-        subject="Test Draft from Python",
-        body="Hello, this draft was created using Gmail API."
+        subject="Test Email from Python",
+        body="Hello, this email was sent using Gmail API."
     )
