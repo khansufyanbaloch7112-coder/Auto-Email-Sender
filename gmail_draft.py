@@ -53,8 +53,9 @@ def create_draft(to, subject, body):
 
     print("Send successfully:", created_draft["id"])
 
-create_draft(
-    to="test@example.com",
-    subject="Test Draft from Python",
-    body="Hello, this draft was created using Gmail API."
-)
+if __name__ == "__main__":
+    create_draft(
+        to="test@example.com",
+        subject="Test Draft from Python",
+        body="Hello, this draft was created using Gmail API."
+    )
